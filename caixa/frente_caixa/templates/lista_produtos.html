@@ -25,6 +25,7 @@
                     <td>R$ {{ produto.preco }}</td>
                     <td>
                         <a href="{% url 'adicionar_ao_carrinho' produto.id %}" class="btn btn-success">Adicionar ao Carrinho</a>
+                        <a href="{% url 'homepage' %}" class="btn btn-secondary mb-3">Voltar à Homepage</a>
                     </td>
                 </tr>
                 {% endfor %}

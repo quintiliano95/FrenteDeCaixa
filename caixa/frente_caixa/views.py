@@ -3,6 +3,10 @@ from .models import Produto, Venda, Carrinho
 from .forms import ProdutoForm, AdicionarAoCarrinhoForm
 
 
+def homepage(request):
+    return render(request, 'homepage.html')
+
+
 def lista_produtos(request):
     produtos = Produto.objects.all()
     return render(request, 'lista_produtos.html', {'produtos': produtos})

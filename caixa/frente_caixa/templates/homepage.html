@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage - Frente de Caixa</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .homepage-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+        .homepage-buttons a {
+            margin: 10px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mt-5">Bem-vindo ao Frente de Caixa</h1>
+        <div class="homepage-buttons">
+            <a href="{% url 'ver_carrinho' %}" class="btn btn-warning btn-lg">Carrinho</a>
+            <a href="{% url 'lista_produtos' %}" class="btn btn-info btn-lg">Lista de Produtos</a>
+        </div>
+    </div>
+</body>
+</html>
