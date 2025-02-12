@@ -17,3 +17,15 @@ class Venda(models.Model):
 
     def __str__(self):
         return f"{self.quantidade}x {self.produto.nome} - {self.total()}"
+
+
+class Carrinho(models.Model):
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    quantidade = models.IntegerField(default=1)
+    data_adicionado = models.DateTimeField(auto_now_add=True)
+
+    def total_item(self):
+        return self.quantidade * self.produto.preco
+
+    def __str__(self):
+        return f"{self.quantidade}x {self.produto.nome} - R$ {self.total_item()}"

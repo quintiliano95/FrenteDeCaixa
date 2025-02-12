@@ -24,7 +24,7 @@
                     <td>{{ produto.nome }}</td>
                     <td>R$ {{ produto.preco }}</td>
                     <td>
-                        <a href="{% url 'registrar_venda' produto.id %}" class="btn btn-primary">Vender</a>
+                        <a href="{% url 'adicionar_ao_carrinho' produto.id %}" class="btn btn-success">Adicionar ao Carrinho</a>
                     </td>
                 </tr>
                 {% endfor %}
