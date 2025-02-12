@@ -1,6 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from .models import Produto, Venda, ItemVenda
+from .forms import EditarProdutoForm
 
 
 def homepage(request):
@@ -69,3 +70,41 @@ def carrinho(request):
 def consulta_produtos(request):
     produtos = Produto.objects.all()
     return render(request, 'consulta_produtos.html', {"produtos": produtos})
+
+
+def detalhes_produtos(request, produtos_id):
+    try:
+        produtos = Produto.objects.get(id=produtos_id)
+        itens = ItemVenda.objects.filter(venda=produtos)
+
+        detalhes = [
+            {
+                "produto": item.produto.nome,
+                "quantidade": item.quantidade,
+                "subtotal": float(item.subtotal),
+            }
+            for item in itens
+        ]
+
+        return JsonResponse({"itens": detalhes})
+
+    except Venda.DoesNotExist:
+        return JsonResponse({"erro": "Venda não encontrada"}, status=404)
+
+
+def editar_produto(request, produto_id):
+    produto = get_object_or_404(Produto, id=produto_id)
+
+    if request.method == 'POST':
+        if 'excluir' in request.POST:  # Verifica se o botão "Excluir" foi pressionado
+            produto.delete()  # Exclui o produto
+            return redirect('consulta_produtos')  # Redireciona de volta para a lista de produtos
+        else:
+            form = EditarProdutoForm(request.POST, instance=produto)
+            if form.is_valid():
+                form.save()
+                return redirect('consulta_produtos')  # Redireciona de volta para a lista de produtos
+    else:
+        form = EditarProdutoForm(instance=produto)
+
+    return render(request, 'editar_produto.html', {'form': form, 'produto': produto})
