@@ -1,8 +1,113 @@
 {% extends "base.html" %}
 
+{% block title %}Nova Venda - PDV{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <h2>Nova Venda</h2>
-    <p>Interface para adicionar produtos e registrar a venda.</p>
+    <form id="venda-form">
+        <div class="mb-3">
+            <label for="produto" class="form-label">Selecione o Produto</label>
+            <select id="produto" class="form-select">
+                {% for produto in produtos %}
+                    <option value="{{ produto.id }}" data-preco="{{ produto.preco }}">{{ produto.nome }} - R$ {{ produto.preco }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="quantidade" class="form-label">Quantidade</label>
+            <input type="number" id="quantidade" class="form-control" min="1" value="1">
+        </div>
+        <button type="button" class="btn btn-success" onclick="adicionarProduto()">Adicionar Produto</button>
+    </form>
+
+    <h3 class="mt-4">Itens da Venda</h3>
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Quantidade</th>
+                <th>Subtotal</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody id="tabela-venda"></tbody>
+    </table>
+
+    <h4>Total: R$ <span id="total">0.00</span></h4>
+    <button class="btn btn-primary mt-3" onclick="finalizarVenda()">Finalizar Venda</button>
 </div>
+
+<script>
+    let itensVenda = [];
+    let totalVenda = 0;
+
+    function adicionarProduto() {
+        let produtoSelect = document.getElementById("produto");
+        let produtoId = produtoSelect.value;
+        let produtoNome = produtoSelect.options[produtoSelect.selectedIndex].text;
+        let preco = parseFloat(produtoSelect.options[produtoSelect.selectedIndex].dataset.preco);
+        let quantidade = parseInt(document.getElementById("quantidade").value);
+
+        if (quantidade < 1) return;
+
+        let subtotal = preco * quantidade;
+        itensVenda.push({ id: produtoId, nome: produtoNome, quantidade: quantidade, subtotal: subtotal });
+
+        atualizarTabela();
+    }
+
+    function atualizarTabela() {
+        let tabela = document.getElementById("tabela-venda");
+        tabela.innerHTML = "";
+        totalVenda = 0;
+
+        itensVenda.forEach((item, index) => {
+            totalVenda += item.subtotal;
+            tabela.innerHTML += `
+                <tr>
+                    <td>${item.nome}</td>
+                    <td>${item.quantidade}</td>
+                    <td>R$ ${item.subtotal.toFixed(2)}</td>
+                    <td><button class="btn btn-danger btn-sm" onclick="removerItem(${index})">Remover</button></td>
+                </tr>
+            `;
+        });
+
+        document.getElementById("total").innerText = totalVenda.toFixed(2);
+    }
+
+    function removerItem(index) {
+        itensVenda.splice(index, 1);
+        atualizarTabela();
+    }
+
+    function finalizarVenda() {
+        if (itensVenda.length === 0) {
+            alert("Adicione pelo menos um produto antes de finalizar a venda.");
+            return;
+        }
+
+        let formData = new FormData();
+        itensVenda.forEach(item => {
+            formData.append("produtos[]", item.id);
+            formData.append("quantidades[]", item.quantidade);
+        });
+
+        fetch("{% url 'nova_venda' %}", {
+            method: "POST",
+            body: formData,
+            headers: { "X-CSRFToken": "{{ csrf_token }}" }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.mensagem) {
+                alert(data.mensagem);
+                window.location.href = "{% url 'homepage' %}";
+            } else {
+                alert(data.erro);
+            }
+        });
+    }
+</script>
 {% endblock %}

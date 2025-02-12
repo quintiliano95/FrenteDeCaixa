@@ -1,31 +1,18 @@
 from django.db import models
 
 class Produto(models.Model):
-    nome = models.CharField(max_length=100)
+    nome = models.CharField(max_length=255)
     preco = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return self.nome
 
 class Venda(models.Model):
+    data = models.DateTimeField(auto_now_add=True)
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+class ItemVenda(models.Model):
+    venda = models.ForeignKey(Venda, on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
-    quantidade = models.IntegerField()
-    data_venda = models.DateTimeField(auto_now_add=True)
-
-    def total(self):
-        return self.quantidade * self.produto.preco
-
-    def __str__(self):
-        return f"{self.quantidade}x {self.produto.nome} - {self.total()}"
-
-
-class Carrinho(models.Model):
-    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
-    quantidade = models.IntegerField(default=1)
-    data_adicionado = models.DateTimeField(auto_now_add=True)
-
-    def total_item(self):
-        return self.quantidade * self.produto.preco
-
-    def __str__(self):
-        return f"{self.quantidade}x {self.produto.nome} - R$ {self.total_item()}"
+    quantidade = models.PositiveIntegerField()
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2)

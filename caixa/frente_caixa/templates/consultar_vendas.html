@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Histórico de Vendas - PDV{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Histórico de Vendas</h2>
+    {% if vendas %}
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>ID da Venda</th>
+                    <th>Data</th>
+                    <th>Total</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for venda in vendas %}
+                <tr>
+                    <td>{{ venda.id }}</td>
+                    <td>{{ venda.data|date:"d/m/Y H:i" }}</td>
+                    <td>R$ {{ venda.total }}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="verDetalhes({{ venda.id }})">Ver Detalhes</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhuma venda registrada.</p>
+    {% endif %}
+</div>
+
+<!-- Modal para exibir detalhes da venda -->
+<div class="modal fade" id="detalhesModal" tabindex="-1" aria-labelledby="detalhesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detalhesModalLabel">Detalhes da Venda</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="detalhes-venda"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function verDetalhes(vendaId) {
+    fetch(`/detalhes_venda/${vendaId}/`)
+    .then(response => response.json())
+    .then(data => {
+        let lista = document.getElementById("detalhes-venda");
+        lista.innerHTML = "";
+        data.itens.forEach(item => {
+            lista.innerHTML += `<li>${item.produto} - ${item.quantidade}x - R$ ${item.subtotal}</li>`;
+        });
+        new bootstrap.Modal(document.getElementById("detalhesModal")).show();
+    });
+}
+</script>
+{% endblock %}
