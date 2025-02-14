@@ -19,3 +19,14 @@ class ItemVenda(models.Model):
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
     quantidade = models.PositiveIntegerField()
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+class Cliente(models.Model):
+    nome = models.CharField(max_length=100)
+    cpf = models.CharField(max_length=14, unique=True, default="000.000.000-00")  # CPF com máscara (###.###.###-##)
+    email = models.EmailField(unique=True)
+    telefone = models.CharField(max_length=15)
+    endereco = models.TextField()
+
+    def __str__(self):
+        return f"{self.nome} - {self.cpf}"

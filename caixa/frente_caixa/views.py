@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from .models import Produto, Venda, ItemVenda
-from .forms import EditarProdutoForm
+from .models import *
+from .forms import *
 
 
 def homepage(request):
@@ -120,3 +120,15 @@ def adicionar_produto(request):
         form = EditarProdutoForm()
 
     return render(request, 'adicionar_produto.html', {'form': form})
+
+
+def cadastrar_cliente(request):
+    if request.method == "POST":
+        form = ClienteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_clientes')  # Redireciona para a lista de clientes
+    else:
+        form = ClienteForm()
+
+    return render(request, 'cadastrar_cliente.html', {'form': form})
