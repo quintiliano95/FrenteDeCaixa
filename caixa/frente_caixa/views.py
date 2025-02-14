@@ -127,7 +127,7 @@ def cadastrar_cliente(request):
         form = ClienteForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('listar_clientes')  # Redireciona para a lista de clientes
+            return redirect('')  # Redireciona para a lista de clientes
     else:
         form = ClienteForm()
 
