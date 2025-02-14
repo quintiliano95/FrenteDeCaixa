@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Consulta de Produtos - PDV{% endblock %}
-
+{% load static %}
 {% block content %}
 <div class="container mt-4">
     <h2>Consulta de Produtos</h2>
@@ -10,7 +10,7 @@
     <div class="mb-3">
         <input type="text" id="searchInput" class="form-control" placeholder="Digite o nome do produto..." onkeyup="filtrarProdutos()">
     </div>
-
+    <a href="{% url 'adicionar_produto' %}" class="btn btn-primary mb-3">Adicionar Produto</a>
     <!-- Tabela de produtos -->
     <table class="table table-striped mt-3">
         <thead>

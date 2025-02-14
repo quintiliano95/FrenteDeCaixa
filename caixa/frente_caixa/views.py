@@ -108,3 +108,15 @@ def editar_produto(request, produto_id):
         form = EditarProdutoForm(instance=produto)
 
     return render(request, 'editar_produto.html', {'form': form, 'produto': produto})
+
+
+def adicionar_produto(request):
+    if request.method == 'POST':
+        form = EditarProdutoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('consulta_produtos')  # Redireciona para a lista de produtos
+    else:
+        form = EditarProdutoForm()
+
+    return render(request, 'adicionar_produto.html', {'form': form})

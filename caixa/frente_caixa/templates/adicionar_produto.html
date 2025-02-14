@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Adicionar Produto - PDV{% endblock %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Adicionar Novo Produto</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="nome" class="form-label">Nome do Produto</label>
+            {{ form.nome }}
+        </div>
+
+        <div class="mb-3">
+            <label for="preco" class="form-label">Preço</label>
+            {{ form.preco }}
+        </div>
+
+        <div class="mb-3">
+            <label for="estoque" class="form-label">Estoque</label>
+            {{ form.estoque }}
+        </div>
+
+        <button type="submit" class="btn btn-success">Adicionar Produto</button>
+        <a href="{% url 'consulta_produtos' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
