@@ -5,11 +5,11 @@
 {% block content %}
 <div class="container mt-4">
     <h2 class="text-center">Cadastro de Cliente</h2>
-            <form method="post">
+            <form method="post" id="formCadastro">
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="id_nome" class="form-label">Nome:</label>
-                    {{ form.nome }}
+                    <input type="text" class="form-control" id="id_nome" name="nome">
                 </div>
                 <div class="mb-3">
                     <label for="id_cpf" class="form-label">CPF:</label>
@@ -22,7 +22,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="id_telefone" class="form-label">Telefone:</label>
-                    <input type="text" class="form-control" id="id_telefone" name="cpf" placeholder="(xx) xxxxx-xxxx">
+                    <input type="text" class="form-control" id="id_telefone" name="telefone" placeholder="(xx) xxxxx-xxxx">
                 </div>
                 <div class="mb-3">
                     <label for="id_endereco" class="form-label">Endereço:</label>
@@ -30,18 +30,34 @@
                            placeholder="Rua Exemplo, 123 - Bairro, Cidade - UF">
                     <small id="enderecoHelp" class="text-danger" style="display: none;">Formato esperado: Rua Exemplo, 123 - Bairro, Cidade - UF</small>
                 </div>
-                <button type="submit" class="btn btn-primary">Cadastrar</button>
+                <button type="submit" class="btn btn-primary" onclick="cadastrarCliente()">Cadastrar</button>
                 <a href="{% url 'homepage' %}" class="btn btn-secondary">Voltar</a>
             </form>
+        </div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="confirmacaoModal" tabindex="-1" aria-labelledby="confirmacaoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmacaoModalLabel">Cadastro Concluído</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                O cliente foi cadastrado com sucesso!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-
     document.addEventListener("DOMContentLoaded", function() {
         let cpfInput = document.getElementById("id_cpf");
 
@@ -58,23 +74,64 @@
         });
     });
 
-    $(document).ready(function(){
-        $('#id_telefone').mask('(00) 00000-0000');
+    $(document).ready(function() {
+        $('#id_telefone').mask('(00) 00000-0000'); // Máscara para telefone
+
+        $("#id_email").on("input", function() {
+            var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailPattern.test(this.value)) {
+                $(this).addClass("is-invalid");
+                $("#emailHelp").show();
+            } else {
+                $(this).removeClass("is-invalid");
+                $("#emailHelp").hide();
+            }
+        });
+
+        // Adicionar CSRF Token às requisições AJAX
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            }
+        });
     });
 
-    document.getElementById("id_email").addEventListener("input", function() {
-        var emailInput = this;
-        var emailHelp = document.getElementById("emailHelp");
-        var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Regex para validar e-mail
+    function cadastrarCliente() {
+        let nome = document.getElementById("id_nome").value;
+        let cpf = document.getElementById("id_cpf").value;
+        let telefone = document.getElementById("id_telefone").value;
+        let email = document.getElementById("id_email").value;
+        let endereco = document.getElementById("id_endereco").value;
 
-        if (!emailPattern.test(emailInput.value)) {
-            emailHelp.style.display = "block"; // Mostra a mensagem de erro
-            emailInput.classList.add("is-invalid"); // Adiciona borda vermelha no Bootstrap
-        } else {
-            emailHelp.style.display = "none"; // Esconde a mensagem de erro
-            emailInput.classList.remove("is-invalid"); // Remove borda vermelha
-        }
-    });
+        $.ajax({
+            url: "/cadastrar_cliente/",  // Caminho da rota correta
+            type: 'POST',
+            contentType: 'application/json',
+            headers: { "X-CSRFToken": getCSRFToken() }, // Adiciona CSRF Token automaticamente
+            data: JSON.stringify({
+                nome: nome,
+                cpf: cpf,
+                telefone: telefone,
+                email: email,
+                endereco: endereco
+            }),
+            success: function(response) {
+                if (response.success) {
+                    console.log("Cliente cadastrado com sucesso!");
+                    $("#confirmacaoModal").modal("show"); // Mostra o modal de sucesso
+                    $("#formCadastro")[0].reset(); // Limpa o formulário
+                }
+            },
+            error: function(xhr) {
+                alert("Erro ao cadastrar cliente: " + xhr.responseJSON.message);
+            }
+        });
+    }
+
+    // Função para pegar o token CSRF
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
 </script>
 
 {% endblock %}

@@ -124,11 +124,20 @@ def adicionar_produto(request):
 
 def cadastrar_cliente(request):
     if request.method == "POST":
-        form = ClienteForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('')  # Redireciona para a lista de clientes
-    else:
-        form = ClienteForm()
+        nome = request.POST.get("nome")
+        cpf = request.POST.get("cpf")
+        telefone = request.POST.get("telefone")
+        email = request.POST.get("email")
+        endereco = request.POST.get("endereco")
 
-    return render(request, 'cadastrar_cliente.html', {'form': form})
+        if nome and cpf:  # Validação simples
+            Cliente.objects.create(
+                nome=nome,
+                cpf=cpf,
+                email=email,
+                telefone=telefone,
+                endereco=endereco
+            )
+
+        return JsonResponse({"success": True, "message": "Cliente cadastrado com sucesso!"})
+    return render(request, "cadastrar_cliente.html")
