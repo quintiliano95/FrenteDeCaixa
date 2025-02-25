@@ -56,6 +56,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -95,7 +96,6 @@
             }
         });
     });
-
     function cadastrarCliente() {
         let nome = document.getElementById("id_nome").value;
         let cpf = document.getElementById("id_cpf").value;
@@ -104,10 +104,10 @@
         let endereco = document.getElementById("id_endereco").value;
 
         $.ajax({
-            url: "/cadastrar_cliente/",  // Caminho da rota correta
+            url: "/cadastrar_cliente/",
             type: 'POST',
             contentType: 'application/json',
-            headers: { "X-CSRFToken": getCSRFToken() }, // Adiciona CSRF Token automaticamente
+            headers: { "X-CSRFToken": $('input[name=csrfmiddlewaretoken]').val() },  // Pega o CSRF corretamente
             data: JSON.stringify({
                 nome: nome,
                 cpf: cpf,
@@ -116,17 +116,34 @@
                 endereco: endereco
             }),
             success: function(response) {
-                if (response.success) {
-                    console.log("Cliente cadastrado com sucesso!");
-                    $("#confirmacaoModal").modal("show"); // Mostra o modal de sucesso
-                    $("#formCadastro")[0].reset(); // Limpa o formulário
-                }
+                console.log("Cliente cadastrado com sucesso!", response);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso!',
+                    text: response.message || 'Cliente cadastrado com sucesso!',
+                });
+                $("#formCadastro")[0].reset();
             },
             error: function(xhr) {
-                alert("Erro ao cadastrar cliente: " + xhr.responseJSON.message);
+                let errorMessage = "Ocorreu um erro ao cadastrar o cliente.";
+                try {
+                    let errorResponse = JSON.parse(xhr.responseText);
+                    if (errorResponse.message) {
+                        errorMessage = errorResponse.message;
+                    }
+                } catch (e) {
+                    console.error("Erro ao processar resposta do servidor:", e);
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro!',
+                    text: errorMessage,
+                });
             }
         });
     }
+
 
     // Função para pegar o token CSRF
     function getCSRFToken() {
