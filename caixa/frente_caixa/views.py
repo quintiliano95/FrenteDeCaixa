@@ -122,6 +122,10 @@ def adicionar_produto(request):
     return render(request, 'adicionar_produto.html', {'form': form})
 
 
+def carrega_template(request):
+    return render(request, "cadastrar_cliente.html")
+
+
 def cadastrar_cliente(request):
     if request.method == "POST":
         nome = request.POST.get("nome")
@@ -131,13 +135,13 @@ def cadastrar_cliente(request):
         endereco = request.POST.get("endereco")
 
         if nome and cpf:  # Validação simples
-            Cliente.objects.create(
+            cliente = Cliente.objects.create(
                 nome=nome,
                 cpf=cpf,
                 email=email,
                 telefone=telefone,
                 endereco=endereco
             )
-
-        return JsonResponse({"success": True, "message": "Cliente cadastrado com sucesso!"})
+            cliente.save()
+            return JsonResponse({"success": True, "message": "Cliente cadastrado com sucesso!", "cliente_id": cliente.id})
     return render(request, "cadastrar_cliente.html")
