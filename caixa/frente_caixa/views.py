@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from .models import *
 from .forms import *
+from django.contrib import messages
 
 
 def homepage(request):
@@ -143,5 +144,6 @@ def cadastrar_cliente(request):
                 endereco=endereco
             )
             cliente.save()
-            return JsonResponse({"success": True, "message": "Cliente cadastrado com sucesso!", "cliente_id": cliente.id})
+            messages.success(request, 'Cliente cadastrado com sucesso!')
+            return redirect(to='cadastrar_cliente')
     return render(request, "cadastrar_cliente.html")

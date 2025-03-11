@@ -9,7 +9,7 @@ function cadastrarCliente() {
         url: "/cadastrar_cliente/",
         type: 'POST',
         contentType: 'application/json',
-        headers: { "X-CSRFToken": $('input[name=csrfmiddlewaretoken]').val() },  // Pega o CSRF corretamente
+        headers: {"X-CSRFToken": $('input[name=csrfmiddlewaretoken]').val()},  // Pega o CSRF corretamente
         data: JSON.stringify({
             nome: nome,
             cpf: cpf,
@@ -17,7 +17,7 @@ function cadastrarCliente() {
             email: email,
             endereco: endereco
         }),
-        success: function(response) {
+        success: function (response) {
             console.log("Cliente cadastrado com sucesso!", response);
             Swal.fire({
                 icon: 'success',
@@ -29,7 +29,7 @@ function cadastrarCliente() {
             });
             $("#formCadastro")[0].reset();
         },
-        error: function(xhr) {
+        error: function (xhr) {
             let errorMessage = "Ocorreu um erro ao cadastrar o cliente.";
             try {
                 let errorResponse = JSON.parse(xhr.responseText);
